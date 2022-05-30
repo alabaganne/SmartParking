@@ -14,7 +14,7 @@ router.post('/', function(req, res) {
 		if(err) return res.status(400).send(err);
 
 		res.status(201).send('created');
-	})
+	});
 });
 
 module.exports = router;

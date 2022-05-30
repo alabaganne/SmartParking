@@ -3,7 +3,13 @@ const connection = require('../connection');
 const router = require('express').Router();
 
 router.get('/', function(req, res) {
-	connection.query('SELECT * FROM reservations', function(err, result) {
+	let sql = 'SELECT * FROM reservations';
+
+	if(req.query.userId) {
+		sql += ' WHERE userId = ' + req.query.userId;
+	}
+
+	connection.query(sql, function(err, result) {
 		if(err) res.status(400).send(err);
 
 		res.send(result);

@@ -8,41 +8,9 @@
 
 	<script src="https://cdn.tailwindcss.com"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<link rel="stylesheet" href="output.css">
 
-	<link rel="stylesheet" href="style.css">
-
-	<script>
-		function handleRegister(e) {
-			e.preventDefault();
-
-			const cin = document.getElementById('cin').value;
-			const name = document.getElementById('name').value;
-			const phoneNumber = document.getElementById('phoneNumber').value;
-			const password = document.getElementById('password').value;
-			const passwordConfirmation = document.getElementById('password-confirmation').value;
-
-			if(password != passwordConfirmation) {
-				alert("Password doesn't match!");
-				return;
-			}
-			
-			axios({
-				method: 'POST',
-				url: 'http://127.0.0.1:3000/api/register',
-				data: {
-					cin,
-					name,
-					phoneNumber,
-					password
-				}
-			}).then(function(res) {
-				console.log(res);
-
-				window.location.replace('http://127.0.0.1:5500/client/login.html');
-			});
-		}
-	</script>
+	<script src="node_modules/axios/dist/axios.min.js"></script>
 </head>
 <body class="flex flex-col">
 	<nav class="py-8 text-white flex justify-between items-center flex-shrink-0 max-w-6xl w-full mx-auto">
@@ -102,5 +70,37 @@
 		</div>
 	</div>
 	<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400">Hassen Ben Douissa</a></footer>
+
+	<script>
+		function handleRegister(e) {
+			e.preventDefault();
+
+			const cin = document.getElementById('cin').value;
+			const name = document.getElementById('name').value;
+			const phoneNumber = document.getElementById('phoneNumber').value;
+			const password = document.getElementById('password').value;
+			const passwordConfirmation = document.getElementById('password-confirmation').value;
+
+			if(password != passwordConfirmation) {
+				alert("Password doesn't match!");
+				return;
+			}
+			
+			axios({
+				method: 'POST',
+				url: 'http://127.0.0.1:3000/api/register',
+				data: {
+					cin,
+					name,
+					phoneNumber,
+					password
+				}
+			}).then(function(res) {
+				console.log('register response', res.data);
+
+				window.location.replace('http://127.0.0.1:8000/login.html');
+			});
+		}
+	</script>
 </body>
 </html>

@@ -8,37 +8,17 @@
 
 	<script src="https://cdn.tailwindcss.com"></script>
 
-	<link rel="stylesheet" href="style.css">
+	<script src="node_modules/axios/dist/axios.min.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-	<script>
-		function handleLogin(e) {
-			e.preventDefault();
-			
-			const cin = document.getElementById('cin').value;
-			const password = document.getElementById('password').value;
-
-			axios({
-				method: 'POST',
-				url: 'http://localhost:3000/api/login',
-				data: {
-					cin,
-					password
-				}
-			}).then(function(res) {
-				console.log('login response', res);
-			});
-		}
-	</script>
+	<link rel="stylesheet" href="output.css">
 </head>
 <body class="flex flex-col">
 	<nav class="py-8 text-white flex justify-between items-center flex-shrink-0 max-w-6xl w-full mx-auto">
 		<div class="font-bold text-2xl">LOGO</div>
 		<div class="flex items-center space-x-6">
 			<a class="text-gray-400 hover:text-gray-50" href="index.html">Home</a>
-			<a class="text-gray-400 hover:text-gray-50" href="#">About</a>
-			<a class="text-gray-400 hover:text-gray-50" href="#">Contact Us</a>
+			<a class="text-gray-400 hover:text-gray-50" href="about.html">About</a>
+			<a class="text-gray-400 hover:text-gray-50" href="contact.html">Contact Us</a>
 		</div>
 	</nav>
 	<div class="-mt-8 flex-grow flex justify-center items-center max-w-6xl mx-auto text-white space-x-24">
@@ -46,8 +26,8 @@
 			<h1 class="text-5xl font-bold">Welcome!</h1>
 			<p class="mt-2 text-gray-300 leading-7">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore magnam accusantium expedita veniam deserunt maxime. Eos eius dolore qui illum facere ratione saepe pariatur natus quae optio necessitatibus explicabo corrupti voluptates quia temporibus provident cum itaque doloribus.</p>
 			<div class="mt-5 space-x-2">
-				<a class="inline-block px-4 py-3 text-sm rounded-md bg-blue-600 hover:bg-blue-700 shadow" href="#">About Us</a>
-				<a href="#" class="inline-block bg-gray-50 hover:bg-gray-200 px-4 py-3 text-sm text-black rounded rounded-md shadow">Contact Us</a>
+				<a class="inline-block px-4 py-3 text-sm rounded-md bg-blue-600 hover:bg-blue-700 shadow" href="about.html">Learn more about us -></a>
+				<a href="contact.html" class="inline-block bg-gray-50 hover:bg-gray-200 px-4 py-3 text-sm text-black rounded-md shadow">Contact -></a>
 			</div>
 		</div>
 		<div class="max-w-md w-full bg-gray-50 p-8 rounded-lg">
@@ -85,6 +65,35 @@
 			</form>
 		</div>
 	</div>
-	<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400">Hassen Ben Douissa</a></footer>
+	<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400 hover:text-blue-500">Hassen Ben Douissa</a></footer>
+
+	<script>
+		function handleLogin(e) {
+			e.preventDefault();
+			
+			const cin = document.getElementById('cin').value;
+			const password = document.getElementById('password').value;
+
+			axios({
+				method: 'POST',
+				url: 'http://localhost:3000/api/login',
+				data: {
+					cin,
+					password
+				}
+			}).then(function(res) {
+				console.log('login response', res.data);
+
+				if(res.data.errorCode === 1) {
+					alert('Invalid Credentials');
+					return;
+				}
+
+				localStorage.setItem('user', JSON.stringify(res.data));
+
+				window.location.replace('http://127.0.0.1:8000/reservations.html');
+			})
+		}
+	</script>
 </body>
 </html>

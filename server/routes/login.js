@@ -9,11 +9,14 @@ router.post('/', function(req, res) {
 		if(err) return res.status(400).send(err);
 
 		if(result.length === 0) {
-			return res.send('invalid credentials');
+			return res.status(200).send({
+				errorCode: 1,
+				message: 'invalid credentials'
+			});
 		}
 
 		res.send(result[0]);
-	})
+	});
 });
 
 module.exports = router;

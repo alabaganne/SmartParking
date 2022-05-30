@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Smart Parking</title>
+
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<link rel="stylesheet" href="output.css">
+
+	<script src="node_modules/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<div class="max-w-7xl w-full mx-auto min-vh-100 flex flex-col">
+		<nav class="py-8 text-white flex justify-between items-center flex-shrink-0">
+			<div class="font-bold text-2xl">LOGO</div>
+			<div class="flex items-center">
+				<a class="text-gray-400 hover:text-gray-50 mr-6" href="index.html">Home</a>
+				<a class="text-gray-400 hover:text-gray-50 mr-6" href="about.html">About</a>
+				<a class="text-gray-400 hover:text-gray-50 mr-6" href="contact.html">Contact Us</a>
+				<button id="logoutBtn" class="px-3 py-2 text-white bg-blue-500 rounded">Logout<button/>
+			</div>
+		</nav>
+		<div class="bg-white shadow rounded-lg p-8 w-full">
+			<div class="flex items-center justify-between">
+				<div>
+					<h1 class="font-bold text-3xl text-blue-500 uppercase">Reservations</h1>
+					<p class="text-sm text-gray-400">Liste de votre réservations:</p>
+				</div>
+				<div>
+					<a class="px-4 py-3 bg-green-500 rounded-lg text-white" href="#">Reserver une autre place -></a>
+				</div>
+			</div>
+			<div class="mt-6 overflow-x-auto">
+				<table class="table table-zebra w-full">
+				  <!-- head -->
+					<thead>
+						<tr>
+							<th></th>
+							<th>Matricule</th>
+							<th>Nombre d'heures</th>
+							<th>N° Place</th>
+							<th class="text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="reservations">
+						<!-- rows -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400 hover:text-blue-500">Hassen Ben Douissa</a></footer>
+	</div>
+
+	<script src="app.js"></script>
+	<script>
+		function getReservations() {
+			let reservationsTBody = document.getElementById('reservations');
+
+			axios({
+				method: 'GET',
+				url: 'http://127.0.0.1:3000/api/reservations',
+				params: {
+					userId: window.user.id
+				}
+			}).then(function(res) {
+				let reservations = res.data;
+				
+				reservationsTBody.innerHTML = '';
+
+				reservations.forEach(function(reservation) {
+					reservationsTBody.innerHTML += `
+						<tr>
+							<th>${reservation.id}</th>
+							<td>${reservation.matricule}</td>
+							<td>${reservation.noHours}</td>
+							<td>${reservation.placeId}</td>
+							<td class="text-right">
+								<button class="px-2 py-2 text-xs bg-red-500 hover:bg-red-600 text-gray-50 rounded" type="button" onclick="deleteReservation(${reservation.id})">
+									Delete
+								</button>
+							</td>
+						</tr>
+					`;
+				});
+			});
+		}
+		getReservations();
+
+		function deleteReservation(id) {
+			console.log('delete reservation ' + id);
+		}
+	</script>
+</body>
+</html>
