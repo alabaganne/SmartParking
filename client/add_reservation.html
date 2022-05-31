@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Smart Parking</title>
+
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<link rel="stylesheet" href="output.css">
+
+	<script src="node_modules/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<div class="max-w-6xl w-full mx-auto min-vh-100 flex flex-col">
+		<nav class="py-8 text-white flex justify-between items-center flex-shrink-0">
+			<div class="font-bold text-2xl">LOGO</div>
+			<div class="flex items-center text-sm">
+				<a class="text-gray-400 hover:text-gray-50 mr-6" href="reservations.html">Mes Reservations</a>
+				<button id="logoutBtn" class="px-3 py-2 text-white bg-blue-500 rounded">Logout -><button/>
+			</div>
+		</nav>
+		<div class="flex-grow flex-center -mt-12">
+			<div class="mt-8 bg-white shadow rounded-lg p-8 w-full max-w-md mx-auto">
+				<div class="text-center">
+					<h1 class="text-2xl font-bold text-blue-500">Faire une Reservation</h1>
+					<p class="text-xs text-gray-500">Remplire le formulaire ci-dessous pour reserver une place</p>
+				</div>
+				<form class="mt-6" onsubmit="submitReservation(event)">
+					<div>
+						<label class="block text-xs text-gray-400" for="matricule">Matricule de voiture:</label>
+						<input class="mt-1 border border-gray-400 outline-none px-2 py-2 rounded w-full" type="text" name="matricule" id="matricule" placeholder="1234 TUN 123">
+					</div>
+					<div class="mt-4">
+						<label class="block text-xs text-gray-400" for="noHours">Nombre d'heures:</label>
+						<input class="mt-1 border border-gray-400 outline-none px-2 py-2 rounded w-full" type="number" name="noHours" id="noHours" placeholder="e.g. 3">
+					</div>
+					<div class="mt-4">
+						<label class="block text-xs text-gray-400" for="place">Numero de la place:</label>
+						<select class="mt-1 border border-gray-400 outline-none px-2 py-2 rounded w-full" name="place" id="place">
+							
+						</select>
+					</div>
+					<button class="mt-6 bg-green-500 hover:bg-green-700 px-4 py-3 text-gray-50 font-medium rounded text-sm w-full">Submit -></button>
+				</form>
+			</div>
+		</div>
+		<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400 hover:text-blue-500">Hassen Ben Douissa</a></footer>
+	</div>
+
+	<script src="app.js"></script>
+	<script>
+		function getPlaces() {
+			let placeSelect = document.getElementById('place');
+			placeSelect.innerHTML = '';
+
+			axios({
+				method: 'GET',
+				url: 'http://localhost:3000/api/places/',
+			}).then(function(res) {
+				console.log('places', res.data);
+
+				for(let i = 0; i < res.data.length; i++) {
+					placeSelect.innerHTML += `
+						<option value="${res.data[i].id}">${res.data[i].id}</option>
+					`;
+				}
+			});
+		}
+		getPlaces();
+
+		function submitReservation(e) {
+			e.preventDefault();
+
+			let matricule = document.getElementById('matricule').value;
+			let noHours = document.getElementById('noHours').value;
+			let placeId = document.getElementById('place').value;
+			
+			axios({
+				method: 'POST',
+				url: 'http://127.0.0.1:3000/api/reservations/',
+				data: {
+					userId: user.id,
+					matricule,
+					noHours,
+					placeId
+				}
+			}).then(function(res) {
+				if(res.status === 201) {
+					window.location.replace('http://localhost:8000/reservations.html');
+				}
+			})
+		}
+	</script>
+</body>
+</html>

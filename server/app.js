@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 app.use('/api/login', require('./routes/login.js'));
 app.use('/api/register', require('./routes/register'));
 app.use('/api/reservations', require('./routes/reservation'));
+app.use('/api/places', require('./routes/place'));
 
 app.listen(3000, () => {
 	console.log('app is listening on port ' + port);

@@ -4,6 +4,7 @@ const router = require('express').Router();
 
 router.get('/', function(req, res) {
 	let sql = 'SELECT * FROM reservations';
+	console.log('req.query.userId', req.query.userId);
 
 	if(req.query.userId) {
 		sql += ' WHERE userId = ' + req.query.userId;
@@ -17,14 +18,15 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-	const { fullName, matricule, noHours } = req.body;
+	const { userId, matricule, noHours, placeId } = req.body;
 
 	let sql = `
-		INSERT INTO reservations (fullName, matricule, noHours)
-		VALUES (?, ?, ?)
+		INSERT INTO reservations (userId, matricule, noHours, placeId)
+		VALUES (?, ?, ?, ?)
 	`;
 
-	connection.query(sql, [fullName, matricule, noHours], function(err, result) {
+	console.log('add reservation has been hit');
+	connection.query(sql, [userId, matricule, noHours, placeId], function(err, result) {
 		if(err) return res.status(400).send(err);
 
 		res.status(201).send('created');

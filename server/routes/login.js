@@ -15,6 +15,8 @@ router.post('/', function(req, res) {
 			});
 		}
 
+		console.log('cin', cin);
+		console.log('password', password);
 		res.send(result[0]);
 	});
 });

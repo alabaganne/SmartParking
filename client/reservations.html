@@ -16,39 +16,40 @@
 	<div class="max-w-7xl w-full mx-auto min-vh-100 flex flex-col">
 		<nav class="py-8 text-white flex justify-between items-center flex-shrink-0">
 			<div class="font-bold text-2xl">LOGO</div>
-			<div class="flex items-center">
-				<a class="text-gray-400 hover:text-gray-50 mr-6" href="index.html">Home</a>
-				<a class="text-gray-400 hover:text-gray-50 mr-6" href="about.html">About</a>
-				<a class="text-gray-400 hover:text-gray-50 mr-6" href="contact.html">Contact Us</a>
-				<button id="logoutBtn" class="px-3 py-2 text-white bg-blue-500 rounded">Logout<button/>
+			<div class="flex items-center text-sm">
+				<a class="text-gray-50 mr-6" href="reservations.html">Mes Reservations</a>
+				<button id="logoutBtn" class="px-3 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">Logout -><button/>
 			</div>
 		</nav>
-		<div class="bg-white shadow rounded-lg p-8 w-full">
-			<div class="flex items-center justify-between">
-				<div>
-					<h1 class="font-bold text-3xl text-blue-500 uppercase">Reservations</h1>
-					<p class="text-sm text-gray-400">Liste de votre réservations:</p>
+		<div class="flex-grow flex justify-center items-center">
+			<div class="bg-white shadow rounded-lg p-8 w-full">
+				<div class="flex items-center justify-between">
+					<div>
+						<h1 class="font-bold text-3xl text-blue-500 uppercase">Mes Reservations</h1>
+						<p class="text-sm text-gray-400">Liste de mes réservations:</p>
+					</div>
+					<div>
+						<a class="p-4 bg-green-500 rounded text-white text-sm font-medium" href="add_reservation.html">Faire une réservation -></a>
+					</div>
 				</div>
-				<div>
-					<a class="px-4 py-3 bg-green-500 rounded-lg text-white" href="#">Reserver une autre place -></a>
+				<div class="mt-6 overflow-x-auto">
+					<table class="table table-zebra w-full">
+					  <!-- head -->
+						<thead>
+							<tr>
+								<th></th>
+								<th>Matricule</th>
+								<th>Date de reservation</th>
+								<th>Nombre d'heures</th>
+								<th>N° Place</th>
+								<th class="text-right">Actions</th>
+							</tr>
+						</thead>
+						<tbody id="reservations">
+							<!-- rows -->
+						</tbody>
+					</table>
 				</div>
-			</div>
-			<div class="mt-6 overflow-x-auto">
-				<table class="table table-zebra w-full">
-				  <!-- head -->
-					<thead>
-						<tr>
-							<th></th>
-							<th>Matricule</th>
-							<th>Nombre d'heures</th>
-							<th>N° Place</th>
-							<th class="text-right">Actions</th>
-						</tr>
-					</thead>
-					<tbody id="reservations">
-						<!-- rows -->
-					</tbody>
-				</table>
 			</div>
 		</div>
 		<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400 hover:text-blue-500">Hassen Ben Douissa</a></footer>
@@ -63,7 +64,7 @@
 				method: 'GET',
 				url: 'http://127.0.0.1:3000/api/reservations',
 				params: {
-					userId: window.user.id
+					userId: user.role === 'admin' ? null : user.id
 				}
 			}).then(function(res) {
 				let reservations = res.data;
@@ -71,15 +72,21 @@
 				reservationsTBody.innerHTML = '';
 
 				reservations.forEach(function(reservation) {
+					let rDate = new Date(reservation.created);
+					let day = rDate.getDay() + 1;
+					let month = rDate.getMonth() + 1;
+					let year = rDate.getFullYear();
+
 					reservationsTBody.innerHTML += `
 						<tr>
 							<th>${reservation.id}</th>
 							<td>${reservation.matricule}</td>
+							<td>${day}/${month}/${year}</td>
 							<td>${reservation.noHours}</td>
 							<td>${reservation.placeId}</td>
 							<td class="text-right">
-								<button class="px-2 py-2 text-xs bg-red-500 hover:bg-red-600 text-gray-50 rounded" type="button" onclick="deleteReservation(${reservation.id})">
-									Delete
+								<button class="px-2 py-2 text-xs font-medium bg-red-500 hover:bg-red-600 text-gray-50 rounded" type="button" onclick="deleteReservation(${reservation.id})">
+									Annuler
 								</button>
 							</td>
 						</tr>
@@ -91,6 +98,16 @@
 
 		function deleteReservation(id) {
 			console.log('delete reservation ' + id);
+
+			axios({
+				method: 'DELETE',
+				url: 'http://localhost:3000/api/reservation/' + id + '/'
+			}).then(function(res) {
+				if(res.status === 200) {
+					console.log('reload');
+					// window.location.reload();
+				}
+			})
 		}
 	</script>
 </body>
