@@ -3,11 +3,21 @@ const connection = require('../connection');
 const router = require('express').Router();
 
 router.get('/', function(req, res) {
-	let sql = 'SELECT * FROM reservations';
-	console.log('req.query.userId', req.query.userId);
+	const { userId } = req.query;
 
-	if(req.query.userId) {
-		sql += ' WHERE userId = ' + req.query.userId;
+	let sql;
+	if(userId) {
+		sql = `
+			SELECT *
+			FROM reservations
+			WHERE userId = ${userId}
+		`
+	} else {
+		sql = `
+			SELECT r.*, u.name
+			FROM reservations r
+			LEFT JOIN users AS u ON u.id = r.userId
+		`;
 	}
 
 	connection.query(sql, function(err, result) {

@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Smart Parking</title>
+	<title>Douissa Parking</title>
 
 	<script src="https://cdn.tailwindcss.com"></script>
 
@@ -13,11 +13,11 @@
 	<script src="node_modules/axios/dist/axios.min.js"></script>
 </head>
 <body>
-	<div class="max-w-7xl w-full mx-auto min-vh-100 flex flex-col">
+	<div class="max-w-6xl w-full mx-auto min-vh-100 flex flex-col">
 		<nav class="py-8 text-white flex justify-between items-center flex-shrink-0">
-			<div class="font-bold text-2xl">LOGO</div>
+			<div class="font-bold text-2xl">Smart Parking</div>
 			<div class="flex items-center text-sm">
-				<a class="text-gray-50 mr-6" href="reservations.html">Mes Reservations</a>
+				<a class="text-gray-50 mr-6" href="reservations.html">Reservations</a>
 				<button id="logoutBtn" class="px-3 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">Logout -><button/>
 			</div>
 		</nav>
@@ -25,11 +25,11 @@
 			<div class="bg-white shadow rounded-lg p-8 w-full">
 				<div class="flex items-center justify-between">
 					<div>
-						<h1 class="font-bold text-3xl text-blue-500 uppercase">Mes Reservations</h1>
-						<p class="text-sm text-gray-400">Liste de mes réservations:</p>
+						<h1 class="font-bold text-3xl text-blue-500 uppercase" id="title"></h1>
+						<p class="text-sm text-gray-400">Liste des réservations:</p>
 					</div>
 					<div>
-						<a class="p-4 bg-green-500 rounded text-white text-sm font-medium" href="add_reservation.html">Faire une réservation -></a>
+						<a class="p-4 bg-green-500 rounded text-white text-sm font-medium" href="add_reservation.html" id="addReservationBtn">Faire une réservation -></a>
 					</div>
 				</div>
 				<div class="mt-6 overflow-x-auto">
@@ -38,6 +38,7 @@
 						<thead>
 							<tr>
 								<th></th>
+								<th id="clientNameCol">Nom du client</th>
 								<th>Matricule</th>
 								<th>Date de reservation</th>
 								<th>Nombre d'heures</th>
@@ -52,11 +53,20 @@
 				</div>
 			</div>
 		</div>
-		<footer class="p-6 text-center text-gray-50 text-sm font-medium">Designed and developed by <a href="#" class="text-blue-400 hover:text-blue-500">Hassen Ben Douissa</a></footer>
+		<footer class="p-6 text-center text-gray-50 text-sm font-medium">Développé par <a href="#" class="text-blue-400 font-medium">Hassen Ben Douissa</a> and <a href="#" class="text-blue-400 font-medium">Mouhamed Zghibi</a></footer>
 	</div>
 
 	<script src="app.js"></script>
 	<script>
+		let titleEl = document.getElementById('title');
+		if(user.role === 'admin') {
+			titleEl.innerHTML = 'Tous les réservations'
+			document.getElementById('addReservationBtn').classList.add('hidden');
+		} else {
+			document.getElementById('clientNameCol').classList.add('hidden');
+			titleEl.innerHTML = 'Mes réservations'
+		}
+
 		function getReservations() {
 			let reservationsTBody = document.getElementById('reservations');
 
@@ -68,25 +78,22 @@
 				}
 			}).then(function(res) {
 				let reservations = res.data;
+				console.log('reservations', reservations);
 				
 				reservationsTBody.innerHTML = '';
 
 				reservations.forEach(function(reservation) {
-					let rDate = new Date(reservation.created);
-					let day = rDate.getDay() + 1;
-					let month = rDate.getMonth() + 1;
-					let year = rDate.getFullYear();
-
 					reservationsTBody.innerHTML += `
 						<tr>
 							<th>${reservation.id}</th>
+							${user.role === 'admin' ? '<td>' + (reservation.name === null ? '<span class="text-red-400">Unkown</span>' : reservation.name) + '</th>' : '' } 
 							<td>${reservation.matricule}</td>
-							<td>${day}/${month}/${year}</td>
-							<td>${reservation.noHours}</td>
+							<td>${new Date(reservation.created).toDateString()}</td>
+							<td>${reservation.noHours === null ? '<span class="text-red-400">N/A</span>' : reservation.noHours}</td>
 							<td>${reservation.placeId}</td>
 							<td class="text-right">
 								<button class="px-2 py-2 text-xs font-medium bg-red-500 hover:bg-red-600 text-gray-50 rounded" type="button" onclick="deleteReservation(${reservation.id})">
-									Annuler
+									${ user.role === 'admin' ? 'Supprimer' : 'Annuler' }
 								</button>
 							</td>
 						</tr>

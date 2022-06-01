@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mobile/screens/home_screen/admin/home.dart';
 import 'package:mobile/screens/signup_screen/signup.dart';
 
 import '../../helper/invoker.dart';
@@ -82,10 +83,13 @@ class _BodyState extends State<Body> {
               ),
             ),            const SizedBox(height: 25,),
             ElevatedButton(onPressed: (){
-              Invoker.post('', {
-                'cin': cinController.text,
-                'password': passwordController.text
-              });
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                return const AdminHome();
+              }));
+             // Invoker.post('', {
+             //   'cin': cinController.text,
+             //   'password': passwordController.text
+             // });
             }, child: const Padding(
               padding: EdgeInsets.all(13.0),
               child: Text('Login'),
