@@ -35,7 +35,6 @@ router.post('/', function(req, res) {
 		VALUES (?, ?, ?, ?)
 	`;
 
-	console.log('add reservation has been hit');
 	connection.query(sql, [userId, matricule, noHours, placeId], function(err, result) {
 		if(err) return res.status(400).send(err);
 

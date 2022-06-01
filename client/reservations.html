@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Douissa Parking</title>
+	<title>Smart Parking</title>
 
 	<script src="https://cdn.tailwindcss.com"></script>
 
@@ -86,7 +86,7 @@
 					reservationsTBody.innerHTML += `
 						<tr>
 							<th>${reservation.id}</th>
-							${user.role === 'admin' ? '<td>' + (reservation.name === null ? '<span class="text-red-400">Unkown</span>' : reservation.name) + '</th>' : '' } 
+							${user.role === 'admin' ? '<td>' + (reservation.name === null ? '<span class="text-red-400">Unkown</span>' : reservation.name) + '</td>' : '' } 
 							<td>${reservation.matricule}</td>
 							<td>${new Date(reservation.created).toDateString()}</td>
 							<td>${reservation.noHours === null ? '<span class="text-red-400">N/A</span>' : reservation.noHours}</td>
@@ -108,13 +108,12 @@
 
 			axios({
 				method: 'DELETE',
-				url: 'http://localhost:3000/api/reservation/' + id + '/'
+				url: 'http://localhost:3000/api/reservations/' + id + '/'
 			}).then(function(res) {
 				if(res.status === 200) {
-					console.log('reload');
-					// window.location.reload();
+					window.location.reload();
 				}
-			})
+			});
 		}
 	</script>
 </body>

@@ -13,8 +13,6 @@ function init() {
 		}
 	}
 	
-	console.log('window.loaction.href', window.location.href);
-	console.log('routeProtected', routeProtected);
 	// if unauthenticated user tries to access protected route, redirect to welcome page where he can login
 	if(!user && routeProtected) {
 		window.location.replace('http://localhost:8000/index.html');
@@ -24,7 +22,6 @@ function init() {
 
 }
 init();
-console.log('user', user);
 
 let logoutBtn = document.getElementById('logoutBtn');
 if(logoutBtn) {
@@ -32,6 +29,8 @@ if(logoutBtn) {
 		console.log('logout');
 		localStorage.removeItem('user');
 		user = null;
-		window.location.replace('http://127.0.0.1:8000/index.html')
+		setTimeout(function() {
+			window.location.replace('http://127.0.0.1:8000/index.html');
+		}, 100)
 	});
 }
