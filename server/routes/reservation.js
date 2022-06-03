@@ -27,6 +27,33 @@ router.get('/', function(req, res) {
 	});
 });
 
+router.get('/:matricule/', function(req, res) {
+	const { matricule } = req.params;
+
+	if(matricule) {
+		let sql = `
+			SELECT *
+			FROM reservations
+			WHERE matricule = '${matricule}'
+			ORDER BY created DESC
+			LIMIT 1
+		`;
+
+		connection.query(sql, function(err, results) {
+			if(err) return res.status(400).send(err);
+
+			const result = results[0];
+			if(!result) {
+				return res.status(404).send('not found');
+			}
+
+			return res.send(result);
+		});
+	} else {
+		return res.status(400).send('matricule is required');
+	}
+});
+
 router.post('/', function(req, res) {
 	const { userId, matricule, noHours, placeId } = req.body;
 
