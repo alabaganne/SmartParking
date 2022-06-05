@@ -50,70 +50,101 @@ class _BodyState extends State<Body> {
     super.initState();
     Reservations reservations = Provider.of<Reservations>(context, listen: false);
     Invoker.get('/api/reservations').then((value){
-      print(value);
-     // reservations.setList = (value as List).map((e) =>
-     //     Reservation(id: e["id"], matricule: e["matricule"], name: e["name"],
-     //         price: e["price"], noHours: e["noHours"],
-     //         placeId: e["placeId"], date: e["created"])
-     // ).toList();
+     reservations.setList = (value as List).map((e) =>
+         Reservation(id: e["id"], matricule: e["matricule"], name: e["name"],
+             price: e["price"], noHours: e["noHours"],
+             placeId: e["placeId"], date: e["created"])
+     ).toList();
     });
   }
 
+  Future<void> onRefresh() async {
+    Reservations reservations = Provider.of<Reservations>(context, listen: false);
+
+    dynamic value = await Invoker.get('/api/reservations');
+      reservations.setList = (value as List).map((e) =>
+          Reservation(id: e["id"], matricule: e["matricule"], name: e["name"],
+              price: e["price"], noHours: e["noHours"],
+              placeId: e["placeId"], date: e["created"])
+      ).toList();
+
+  }
   @override
   Widget build(BuildContext context) {
 
     return Consumer<Reservations>(
       builder: (context, reservations, child) {
-        return ListView.builder(itemCount: reservations.getList.length + 1,itemBuilder: (context, index){
-          if(index == 0){
-            return Overfill(len: reservations.getList.length,);
-          }
-          index -= 1;
-          Reservation reservation = reservations.getList[index];
-          return Padding(padding: const EdgeInsets.all(8),
-            child: Material(
-              elevation: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50)
-                ),
-                height: 150,
-                child: Slidable(
-                  endActionPane: ActionPane(motion: const ScrollMotion(),
-                  children: [
-                    SlidableAction(onPressed: (context){
-                      Invoker.delete('/api/reservations/${reservation.id}').then((value){
-                        reservations.removeReservation(reservation);
-                      });
-                    },
-                    backgroundColor: const Color(0xff791818),
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: "Remove",
-                    )
-                  ],
+        return RefreshIndicator(
+          onRefresh: onRefresh,
+          child: ListView.builder(itemCount: reservations.getList.length + 1,itemBuilder: (context, index){
+            if(index == 0){
+              return Overfill(len: reservations.getList.length,);
+            }
+            index -= 1;
+            Reservation reservation = reservations.getList[index];
+            return Padding(padding: const EdgeInsets.all(8),
+              child: Material(
+                elevation: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50)
+                  ),
+                  height: 150,
+                  child: Slidable(
+                    endActionPane: ActionPane(motion: const ScrollMotion(),
+                    children: [
+                      SlidableAction(onPressed: (context){
+                        Invoker.delete('/api/reservations/${reservation.id}').then((value){
+                          reservations.removeReservation(reservation);
+                        });
+                      },
+                      backgroundColor: const Color(0xff791818),
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: "Remove",
+                      )
+                    ],
 
+                    ),
+                    child: ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              (reservation.name != null)?
+                              Text("Client Name: ${reservation.name}")
+                              :Row(
+                                children: const [
+                                  Text("Client Name: "),
+                                  Text("Unknown", style: TextStyle(color: Colors.red),)
+                                ],
+                              ),
+
+                              Text("Place: ${reservation.placeId}"),
+                              Text("Reservation Date: ${reservation.reservationDate}"),
+                              (reservation.noHours != null)?
+                              Text("number of hours: ${reservation.noHours}")
+                              :Row(
+                                children: const [
+                                  Text("number of hours: "),
+                                  Text("N/A", style: TextStyle(color: Colors.red),)
+                                ],
+                              )
+                            ],),
+                          (reservation.price != null)?
+                           Text("${reservation.price} dt")
+                            :const Text("N/A", style: TextStyle(color: Colors.red),),
+
+                        ],),
+                    ),
                   ),
-                  child: ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text("Client Name: ${reservation.name}"),
-                            Text("Place: ${reservation.placeId}"),
-                            Text("Reservation Date: ${reservation.reservationDate}"),
-                            Text("number of hours: ${reservation.noHours}")
-                          ],),
-                         Text("${reservation.price} dt")
-                      ],),
-                  ),
-                ),
-              ),),
-            );
-        });
+                ),),
+              );
+          }),
+        );
       }
     );
   }

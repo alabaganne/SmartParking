@@ -34,7 +34,7 @@ class Reservations extends ChangeNotifier{
     _list = r;
     notifyListeners();
   }
-  List<Reservation> get getList => _list;
+  List<Reservation> get getList => _list.reversed.toList();
 
   addReservation(Reservation r){
     _list.add(r);
