@@ -10,11 +10,12 @@ function init() {
 	for(let i = 0; i < protectedRoutes.length; i++) {
 		if(window.location.href.includes(protectedRoutes[i])) {
 			routeProtected = true
+			break;
 		}
 	}
 	
 	// if unauthenticated user tries to access protected route, redirect to welcome page where he can login
-	if(!user && routeProtected) {
+	if(user !== null && routeProtected) {
 		window.location.replace('http://localhost:8000/index.html');
 	} else if(user && !routeProtected) { // if authenticated user tries to access login page, redirect to reservations page
 		window.location.replace('http://localhost:8000/reservations.html');

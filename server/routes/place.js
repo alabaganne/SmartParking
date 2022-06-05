@@ -11,7 +11,7 @@ router.get('/', function(req, res) {
 			SELECT *
 			FROM reservations r
 			WHERE p.id = r.placeId
-			AND r.created + r.noHours < CURRENT_TIMESTAMP
+			AND ADDDATE(r.created, INTERVAL r.noHours HOUR ) < CURRENT_TIMESTAMP
 		)
 	`;
 
