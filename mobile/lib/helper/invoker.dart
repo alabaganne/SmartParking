@@ -5,9 +5,15 @@ import 'package:mobile/constants.dart';
 
 class Invoker{
 
-  static Future<dynamic> post(String path, Map<String, String> body) async{
-    dynamic response = http.post(Uri.http(serverHost, path), body: body);
-    return jsonDecode(response);
+  static Future<Map> post(String path, Map<String, String> body) async{
+    http.Response response = await http.post(Uri.http(Ip.serverHost, path), body: body);
+
+    return jsonDecode(response.body);
+  }
+
+  static Future<dynamic> get(String path) async{
+    http.Response response = await http.get(Uri.http(Ip.serverHost, path));
+    return jsonDecode(response.body);
   }
 
 }

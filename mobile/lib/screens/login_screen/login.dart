@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile/screens/home_screen/admin/home.dart';
+import 'package:mobile/screens/home_screen/client/home.dart';
 import 'package:mobile/screens/signup_screen/signup.dart';
 
+import '../../constants.dart';
 import '../../helper/invoker.dart';
 
 class Login extends StatelessWidget {
@@ -10,8 +12,24 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Body(),
+    return Scaffold(
+      appBar: AppBar(actions: [ElevatedButton(onPressed: (){
+        showDialog(context: context, builder: (_){
+          TextEditingController controller = TextEditingController();
+
+          return AlertDialog(title: const Text("enter your ip"),
+          content: SizedBox(height: 100,child: Column(children: [ TextField(controller: controller,), Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(onPressed: (){
+                Ip.serverHost = "${controller.text}:3000";
+                print(Ip.serverHost);
+                Navigator.of(context).pop();
+              }, child:  Text("Ok")),
+            ],
+          )],),),);});
+      }, child: const Padding(padding: EdgeInsets.all(18),))],),
+      body: const Body(),
     );
   }
 }
@@ -45,7 +63,7 @@ class _BodyState extends State<Body> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: height*.15,),
+            SizedBox(height: height*.01,),
             SvgPicture.asset('assets/images/undraw_city_driver_re_9xyv.svg', height: height*.4,),
 
             TextField(
@@ -83,13 +101,49 @@ class _BodyState extends State<Body> {
               ),
             ),            const SizedBox(height: 25,),
             ElevatedButton(onPressed: (){
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-                return const AdminHome();
-              }));
-             // Invoker.post('', {
-             //   'cin': cinController.text,
-             //   'password': passwordController.text
-             // });
+              // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+              //   return const ClientHome();
+              // }));
+             Invoker.post('/api/login', {
+               'cin': cinController.text,
+               'password': passwordController.text
+             }).then((value){
+               if(value.containsKey("errorCode")){
+                 print("invalid");
+                  showDialog(context: context, builder: (context){
+                   return AlertDialog(title: const Text("Invalid Credentials"),
+                     content: SizedBox(height: 100,
+                         child: Column(
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           children: [const Text("CIN or Password are wrong", style: TextStyle(letterSpacing: 1.4),),
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.end,
+                               children: [
+                                 TextButton(onPressed: (){Navigator.of(context).pop();},
+                                     child: const Text("Ok")),
+                               ],
+                             )
+                           ],
+                         )
+                     ),
+                   );
+                 });
+                 return;
+               }
+               if (!value.containsKey('role')){
+                 return;
+               }
+               if(value["role"]  == "admin"){
+                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                   return const AdminHome();
+                 }));
+               }else{
+                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                   return const ClientHome();
+                 }));
+               }
+             });
             }, child: const Padding(
               padding: EdgeInsets.all(13.0),
               child: Text('Login'),
