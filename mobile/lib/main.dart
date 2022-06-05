@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/reservations.dart';
 import 'package:mobile/screens/splash_screen/splash.dart';
+import 'package:provider/provider.dart';
+
+import 'models/user.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(
+        create: (_)=>User(),
+      ),
+      ChangeNotifierProvider(
+          create: (_)=>Reservations())
+    ],child: const MyApp(),)
+
+  );
 }
 
 class MyApp extends StatelessWidget {

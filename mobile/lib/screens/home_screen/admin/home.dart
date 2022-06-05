@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mobile/models/reservations.dart';
 import 'package:mobile/screens/login_screen/login.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+import '../../../helper/invoker.dart';
 
 
 class AdminHome extends StatefulWidget {
@@ -41,59 +45,83 @@ class _BodyState extends State<Body> {
   String price = "30";
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Reservations reservations = Provider.of<Reservations>(context, listen: false);
+    Invoker.get('/api/reservations').then((value){
+      print(value);
+     // reservations.setList = (value as List).map((e) =>
+     //     Reservation(id: e["id"], matricule: e["matricule"], name: e["name"],
+     //         price: e["price"], noHours: e["noHours"],
+     //         placeId: e["placeId"], date: e["created"])
+     // ).toList();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    return ListView.builder(itemCount: 6,itemBuilder: (context, index){
-      if(index == 0){
-        return Overfill();
-      }
-      return Padding(padding: const EdgeInsets.all(8),
-        child: Material(
-          elevation: 8,
-          child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50)
-            ),
-            height: 150,
-            child: Slidable(
-              endActionPane: ActionPane(motion: ScrollMotion(),
-              children: [
-                SlidableAction(onPressed: (context){
-
-                },
-                backgroundColor: const Color(0xff791818),
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                  label: "Remove",
-                )
-              ],
-
-              ),
-              child: ListTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<Reservations>(
+      builder: (context, reservations, child) {
+        return ListView.builder(itemCount: reservations.getList.length + 1,itemBuilder: (context, index){
+          if(index == 0){
+            return Overfill(len: reservations.getList.length,);
+          }
+          index -= 1;
+          Reservation reservation = reservations.getList[index];
+          return Padding(padding: const EdgeInsets.all(8),
+            child: Material(
+              elevation: 8,
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50)
+                ),
+                height: 150,
+                child: Slidable(
+                  endActionPane: ActionPane(motion: const ScrollMotion(),
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    SlidableAction(onPressed: (context){
+                      Invoker.delete('/api/reservations/${reservation.id}').then((value){
+                        reservations.removeReservation(reservation);
+                      });
+                    },
+                    backgroundColor: const Color(0xff791818),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: "Remove",
+                    )
+                  ],
+
+                  ),
+                  child: ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Client Name: ${name}"),
-                        Text("Place: ${place}"),
-                        Text("Reservation Date: ${date}")
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text("Client Name: ${reservation.name}"),
+                            Text("Place: ${reservation.placeId}"),
+                            Text("Reservation Date: ${reservation.reservationDate}"),
+                            Text("number of hours: ${reservation.noHours}")
+                          ],),
+                         Text("${reservation.price} dt")
                       ],),
-                     Text("${price} dt")
-                  ],),
-              ),
-            ),
-          ),),
-        );
-    });
+                  ),
+                ),
+              ),),
+            );
+        });
+      }
+    );
   }
 }
 
 class Overfill extends StatefulWidget {
-  const Overfill({Key? key}) : super(key: key);
-
+  Overfill({Key? key, required this.len}) : super(key: key);
+  int len;
   @override
   State<Overfill> createState() => _OverfillState();
 }
@@ -106,17 +134,19 @@ class _OverfillState extends State<Overfill> {
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
-    chartData = <_ChartData>[
-      _ChartData(
-          'Full', 3500, const Color.fromRGBO(235, 97, 143, 1), 'Block A'),
-      _ChartData(
-          'Full', 5000, const Color.fromRGBO(97, 235, 198, 1.0), 'Block B'),
-    ];
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    chartData = <_ChartData>[
+      _ChartData(
+          'Full', 0, const Color.fromRGBO(194, 97, 235, 1.0), 'Block A'),
+
+      _ChartData(
+          'Full', widget.len, const Color.fromRGBO(97, 235, 198, 1.0), 'Block B'),
+    ];
     return _buildAngleRadialBarChart();
   }
 
@@ -136,25 +166,25 @@ class _OverfillState extends State<Overfill> {
           CircularChartAnnotation(
             angle: 0,
             radius: '0%',
-            height: '35%',
+            height: '50%',
             width: orientation == Orientation.landscape
                 ? '65%'
                 : '55%',
             widget: Column(
-              children: const <Widget>[
-                Padding(
+              children:  <Widget>[
+                const Padding(
                     padding: EdgeInsets.only(
                         top: 0),
                     child: Text('Empty -',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize:15))),
-                Padding(
+                const Padding(
                     padding: EdgeInsets.only(
                         top:0)),
-                Text('6 spots',
+                Text('${10 - widget.len} spots',
                     softWrap: false,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14))
               ],
@@ -176,9 +206,10 @@ class _OverfillState extends State<Overfill> {
     final List<RadialBarSeries<_ChartData, String>> list =
     <RadialBarSeries<_ChartData, String>>[
       RadialBarSeries<_ChartData, String>(
-          maximumValue: 6000,
+          strokeWidth: 1,
+          maximumValue: 10,
           radius: '100%',
-          gap: '3%',
+          gap: '1%',
           dataSource: chartData,
           cornerStyle: CornerStyle.bothCurve,
           xValueMapper: (_ChartData data, _) => data.x,

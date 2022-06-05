@@ -3,9 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile/screens/home_screen/admin/home.dart';
 import 'package:mobile/screens/home_screen/client/home.dart';
 import 'package:mobile/screens/signup_screen/signup.dart';
+import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import '../../helper/invoker.dart';
+import '../../models/user.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -134,6 +136,8 @@ class _BodyState extends State<Body> {
                if (!value.containsKey('role')){
                  return;
                }
+               User user = Provider.of<User>(context, listen:false);
+               user.setUser = value as Map<String, dynamic>;
                if(value["role"]  == "admin"){
                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
                    return const AdminHome();
