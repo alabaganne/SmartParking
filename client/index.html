@@ -88,10 +88,9 @@
 					return;
 				}
 
-				localStorage.removeItem('user');
-				localStorage.setItem('user', JSON.stringify(res.data));
+				window.localStorage.setItem('user', JSON.stringify(res.data));
 
-				window.location.replace('http://127.0.0.1:8000/reservations.html');
+				window.location.href = '/reservations.html';
 			});
 		}
 	</script>
